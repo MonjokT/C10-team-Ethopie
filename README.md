@@ -89,4 +89,5 @@ This project was developed as part of TRI AI Saturdays Cohort 10. Thanks to the 
 - Levenshtein, V. I. (1966). Binary codes capable of correcting deletions, insertions, and reversals. Soviet Physics Doklady, 10(8), 707–710.
 - Snover, M., Dorr, B., Schwartz, R., Micciulla, L., and Makhoul, J. (2006). A study of translation edit rate with targeted human annotation. Proceedings of AMTA, 223–231.
 - Devatine, N., and Abraham, L. (2024). Assessing human editing effort on LLM generated texts via compression based edit distance. arXiv preprint. https://arxiv.org/abs/2412.17321
+  
 -TRI AI Saturdays (2026). Cohort 10 Project Requirements and Structure. AI Saturdays Lagos, in partnership with Google DeepMind's AI Research Foundations curriculum and University College London. https://aisaturdayslagos.github.io/cohort_structure/cohort10/projects.html
