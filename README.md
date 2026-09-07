@@ -70,6 +70,16 @@ Evaluation metric: mean character-level Levenshtein distance against hidden refe
 - 📄 README.md
 - 📄 requirements.txt
 
+## **🧗 Debugging & Engineering Notes**
+
+Getting from a working notebook to a working *Kaggle submission* surfaced several environment issues worth documenting for future cohorts attempting similar fine-tuning tasks on Kaggle's free GPU tier:
+
+- **Multi-GPU silently breaks single-GPU training code.** Kaggle's T4 x2 accelerator caused repeated CUDA out-of-memory errors during `Trainer.train()`, even after correctly setting `device_map={"": 0}` at model load time. The fix required setting `os.environ["CUDA_VISIBLE_DEVICES"] = "0"` as the very first line executed in the session — `device_map` alone doesn't prevent `Trainer` from initializing multi-GPU data-parallel training.
+- **GPU memory doesn't clear on a failed run.** Re-running a cell after a CUDA OOM error fails identically every time, since the crashed allocation stays resident. A full session restart is required before every retry, not just re-executing the failing cell.
+- **Model variant selection matters.** Kaggle's model search surfaces near-identical listings (e.g. `gemma-2-2b-it` vs. `gemma-2-2b-jpn-it`, a Japanese-tuned variant) that load without error but are wrong for the task — worth explicitly verifying the attached model path before training.
+- **Offline-mode constraints.** Competition notebooks run with internet disabled during the committed "Save & Run All" pass, which ruled out `pip install`-ing extra dependencies (e.g. `trl`, `bitsandbytes`) at submission time — we adapted training code to rely only on packages preinstalled in Kaggle's base image.
+- **Retrieval-matching granularity affects output diversity.** An early version of the generation loop matched style-cue documents by theme only, causing several test prompts sharing a theme to receive identical style cues and, under greedy decoding, identical output text. Switching to per-prompt TF-IDF similarity matching (theme + region first, falling back to theme alone) resolved the duplication.
+
 ## **👥 Contributors**
 
 - Team: Ethopie
