@@ -100,6 +100,19 @@ Getting from a working notebook to a working *Kaggle submission* surfaced severa
 
 - Program: TRI AI Saturdays, Cohort 10 (Google DeepMind AI Research Foundations curriculum, in partnership with AI Saturdays Lagos)
 
+
+## **PROJECT SUMMARY**
+
+In this project, two approaches were used to see the effect of fine-tuning on the Levenshtein distance score: a simple retrieval baseline(i.e,no training at all) and a LoRA fine-tuned model trained on our 38 example stories. A baseline score of 189.75 was achieved on the retrieval approach because it works by picking the most similar existing story we already had and reusing it wholesale, rather than writing something new for the specific prompt given.
+
+To make this concrete using our own dataset: for the test prompt "Hyena jumps at the moon in water.", the baseline searched train_prompts.csv for the closest matching prompt and simply copied over its reference_story:
+
+"Hyena saw the moon in a still pond and leapt to seize it, soaking his muzzle in mud. Owl hooted that some lights are for watching, not eating. Hyena laughed, washed, and guarded the pond so calves could drink by starlight. Knowing what you cannot catch is also a kind of feast."
+
+This story is a real, complete folktale — but it wasn't written for this exact prompt, it was just the closest thing we already had lying around. Since Levenshtein distance counts every letter-level difference between our answer and the hidden correct one, reusing an unrelated (if similar) story naturally racks up a high edit count, hence the 189.75 average across our 10 test prompts.
+
+This relates directly to our topic because it shows why fine-tuning matters here: a model that only retrieves existing text has no way to adjust its wording to match a new, unseen prompt. Fine-tuning, even on a small set of 38 examples, gives the model a chance to actually generate text tailored to each specific prompt instead of recycling something similar, which is the whole point of trying to preserve and generate authentic folktale narratives rather than just retrieving old ones.
+
 ## **📜 Acknowledgment**
 
 This project was developed as part of TRI AI Saturdays Cohort 10. Thanks to the team, weekly guests,and cohort peers for their guidance throughout the programme.
