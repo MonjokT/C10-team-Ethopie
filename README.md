@@ -1,65 +1,80 @@
-# African Folktales SLM — Team Ethopie
+📖 African Folktales SLM — Preserving Oral Tradition with a Domain-Specific Language Model
 
-**Programme:** TRI AI Saturdays, Cohort 10 (built on Google DeepMind's AI Research Foundations curriculum, in partnership with AI Saturdays Lagos and UCL)
-**Competition:** African Folktales SLM Challenge (Kaggle, private community prediction competition)
+**🌍 Project Overview**
+This project fine-tunes a small language model to generate African folktale narratives that stay faithful to regional themes, dialects, and storytelling structure. Using a synthetic folktale benchmark corpus (documents, prompts, and reference stories spanning trickster tales, origin myths, moral tales, hero journeys, animal fables, and community wisdom across West, East, Southern, Central Africa, and the diaspora), we generate short stories from prompts and score them against hidden reference stories using character-level Levenshtein distance.
 
-## Problem statement
+Mainstream LLMs are trained mostly on Western text and often flatten African dialect and narrative voice. This project is a small-scale proof of concept toward domain-specific models that can support cultural preservation, education, and creative storytelling for communities often left out of mainstream AI development.
 
-The preservation of African folktales, and the cultural memory, values, and oral traditions they carry, is a growing challenge. Manual transcription and scattered anthropological archives are slow and incomplete, and mainstream language models are trained mostly on Western text, so they struggle to generate African stories that feel authentic in dialect and structure. This project explores a small, domain-specific language model that can generate narratives reflecting regional themes and storytelling structures, as a step toward tools for cultural preservation, education, and creative storytelling.
+**🎯 Objectives**
+- Explore and clean the competition's folktale corpus (documents, train and test prompts).
+- Build a non-parametric TF-IDF retrieval baseline as a lower bound, with no training required.
+- Fine-tune Gemma-2-2B-IT with LoRA adapters to generate stories that closely match reference style and phrasing.
+- Compare a standard LoRA setup against an optimized, loss-masked configuration.
+- Validate every submission against the competition's required output schema before scoring.
 
-## Dataset
+**⚙️ Tools & Libraries**
+- Python
+- Pandas, Scikit-learn
+- PyTorch, Hugging Face Transformers, PEFT, Datasets
+- Kaggle Notebooks (GPU runtime)
 
-We use the competition-provided synthetic folktale corpus:
+**📊 Dataset**
+Source: TRI AI's African Folktales SLM Challenge (Kaggle), a synthetic benchmark corpus (v1, original synthetic narratives, not real transcriptions).
 
-- `data/documents.csv` — 24 source folktales, each with `document_id`, `title`, `theme`, `culture_region`, `text`, `origin`, and `license`.
-- `data/train_prompts.csv` — 38 prompt → reference-story pairs, each linked to a source document via `document_id`, spanning themes (trickster, origin_myth, moral_tale, hero_journey, animal_fable, community_wisdom) and regions (west, east, southern, central Africa, diaspora).
-- `data/test_prompts.csv` — 10 held-out prompts we must generate stories for.
-- `data/sample_submission.csv`, `data/baseline_submission.csv` — required output format and a worked example.
+Key files (in data/):
+- documents.csv — 24 source folktales with theme, culture_region, text, origin, and license.
+- train_prompts.csv — 38 prompt → reference-story pairs, each linked to a source document.
+- test_prompts.csv — 10 held-out prompts to generate stories for.
+- sample_submission.csv, baseline_submission.csv — required output format and worked example.
 
-The corpus is v1, original synthetic narratives created for this benchmark, not transcriptions of real oral histories. The dataset card in `docs/data_card.pdf` documents provenance and licensing in full.
+**🧩 Approach Highlights**
+- Retrieval baseline: TF-IDF (unigram + bigram) vectorization with cosine similarity, matching each test prompt to the closest training reference story within the same theme.
+- Prompt formatting: every training example is converted into a Gemma-2 chat-style prompt (theme, region, prompt, and a style cue drawn from the matching source document).
+- Loss masking: prompt tokens are masked with -100 during training so gradients focus entirely on the story text rather than the instruction header.
+- Length and decoding control: since Levenshtein distance penalizes both paraphrasing and extra length, generation uses greedy decoding (do_sample=False) with output length capped close to the observed reference-story lengths.
 
-## Training pipeline
+**🤖 Modeling Approach**
+Two LoRA configurations were compared:
+- Baseline LoRA — rank r=8, attention-only targets (q_proj, v_proj), standard full-sequence cross-entropy loss. Training loss plateaued around ~2.19.
+- Optimized LoRA (used for final submission) — rank r=16, alpha=32, targets both attention and MLP projections (q/k/v/o_proj, gate/up/down_proj), with prompt-loss masking, 512-token context, and a cosine learning-rate schedule. Training loss dropped to ~0.0073.
 
-Our notebook (`notebooks/african-folktales-slm.ipynb`) proceeds in stages:
+Evaluation metric: mean character-level Levenshtein distance against hidden reference stories (lower is better).
 
-1. **EDA** — load all three CSVs, inspect theme/region balance, word-count distributions, and missing values; drop the unused `source_url` column.
-2. **Retrieval baseline** — a TF-IDF (unigram + bigram) + cosine-similarity retriever that, for each test prompt, returns the closest training reference story within the same theme. This needs no training and gives a non-parametric lower bound.
-3. **Prompt formatting** — every `train_prompts.csv` row is turned into a Gemma-2 chat-formatted example (`<start_of_turn>user ... <start_of_turn>model ...`), using the matching source document's text as a style cue.
-4. **LoRA fine-tuning** — Gemma-2-2B-IT loaded in 4-bit/fp16 on a single Kaggle GPU. Two configurations are compared:
-   - *Baseline LoRA*: `r=8`, attention-only targets (`q_proj`, `v_proj`), full-sequence cross-entropy loss (loss computed over prompt tokens too).
-   - *Optimized LoRA (used for final submission)*: `r=16`, `alpha=32`, targets attention **and** MLP projections (`q/k/v/o_proj`, `gate/up/down_proj`), and masks prompt tokens with `-100` so gradients only flow through the story tokens. Trained 5 epochs, batch size 1 with gradient accumulation 4, cosine LR schedule, `MAX_SEQ_LENGTH=512`.
-5. **Generation** — greedy decoding (`do_sample=False`) with `MAX_NEW_TOKENS=180`, chosen deliberately: the competition's character-level Levenshtein metric penalizes paraphrasing and length inflation, so low-variance decoding and tight length control matter more than creative diversity (see literature-review section in the notebook for the full rationale).
+**🛠️ How to Use the Code**
+- Attach the competition dataset (african-folktales-slm) and, for the LoRA sections, the Gemma-2-2B-IT model as Kaggle Inputs, or install the packages in requirements.txt to run locally.
+- Open notebooks/african-folktales-slm.ipynb and run top to bottom:
+  - Sections 1–3 load the data and run EDA (no GPU needed).
+  - Section 4 produces the TF-IDF retrieval baseline submission.
+  - Sections 5–7 build training examples, load Gemma-2, and fine-tune with LoRA (set USE_LORA = True).
+  - Section 8 validates the final submission.csv (correct columns, row count, prompt order, no missing values) before submitting.
+- On Kaggle: Save Version → Save & Run All, then submit the committed notebook's submission.csv.
 
-## Evaluation
+**🧠 Insights & Expected Outcomes**
+- A working comparison between a zero-training retrieval baseline and LoRA fine-tuning for closely matching reference narrative style.
+- Evidence that prompt-loss masking and full attention+MLP LoRA targeting substantially improve training loss over a narrower baseline LoRA setup.
+- A reproducible pipeline that could extend to real oral-history recordings and additional African languages and regions in future work.
 
-The competition scores submissions on **mean character-level Levenshtein distance** against hidden reference stories (lower is better). Before every submission we run an integrity check (`Section 8` in the notebook) asserting:
-- columns are exactly `PromptId, Story`
-- row count and `PromptId` order match `test_prompts.csv`
-- no missing or empty-string stories
+**🧭 Repository Structure**
+- 📁 data/ — documents.csv, train_prompts.csv, test_prompts.csv, sample/baseline submissions
+- 📁 docs/ — Cohort Challenge deliverables (problem statement, data card, impact statement, stakeholder engagement)
+- 📁 notebooks/ — african-folktales-slm.ipynb (EDA, baseline, LoRA fine-tuning, submission validation)
+- 📁 scripts/ — notes on where standalone scripts would live if the notebook is later split up
+- 📄 README.md
+- 📄 requirements.txt
 
-We compare the retrieval-only baseline against both LoRA configurations on this metric; the masked, higher-rank LoRA setup produced substantially lower training loss (~0.007 vs ~2.19 for the baseline configuration) and is the version used to produce the final `submission.csv`.
+**👥 Contributors**
+- Team: Ethopie
+- Team members: *(add full names / GitHub handles here)*
+- Mentors: *(add mentor name(s) here)*
+- Program: TRI AI Saturdays, Cohort 10 (Google DeepMind AI Research Foundations curriculum, in partnership with AI Saturdays Lagos and UCL)
 
-## Reproduction
+**📜 Acknowledgment**
+This project was developed as part of TRI AI Saturdays Cohort 10. Thanks to our mentors and cohort peers for their guidance throughout the programme.
 
-1. Create an environment with the packages in `requirements.txt` (or open the notebook directly on Kaggle, where these are preinstalled).
-2. Attach the competition dataset (`african-folktales-slm`) and, for the LoRA sections, the Gemma-2-2B-IT model as a Kaggle Input.
-3. Run `notebooks/african-folktales-slm.ipynb` top to bottom:
-   - Sections 1–3 load data and run EDA — no GPU required.
-   - Section 4 produces the TF-IDF retrieval baseline submission.
-   - Section 5 builds the SFT/LoRA training examples.
-   - Sections 6–7 load Gemma-2, fine-tune with LoRA (set `USE_LORA = True`), and regenerate `submission.csv` on the fine-tuned model.
-   - Section 8 validates the final `submission.csv` before it is submitted.
-4. On Kaggle: **Save Version → Save & Run All**, then submit the committed notebook's `submission.csv` via the competition page.
-
-## Appendix
-
-**Team:** Ethopie
-**Contributors:** *(add full names / GitHub handles here)*
-**Mentors:** *(add mentor name(s) here)*
-
-## References
-
-- Wagner, R. A., and Fischer, M. J. (1974). The string to string correction problem. *Journal of the ACM*, 21(1), 168–173.
-- Levenshtein, V. I. (1966). Binary codes capable of correcting deletions, insertions, and reversals. *Soviet Physics Doklady*, 10(8), 707–710.
-- Snover, M., Dorr, B., Schwartz, R., Micciulla, L., and Makhoul, J. (2006). A study of translation edit rate with targeted human annotation. *Proceedings of AMTA*, 223–231.
+**🔗 References**
+- Wagner, R. A., and Fischer, M. J. (1974). The string to string correction problem. Journal of the ACM, 21(1), 168–173.
+- Levenshtein, V. I. (1966). Binary codes capable of correcting deletions, insertions, and reversals. Soviet Physics Doklady, 10(8), 707–710.
+- Snover, M., Dorr, B., Schwartz, R., Micciulla, L., and Makhoul, J. (2006). A study of translation edit rate with targeted human annotation. Proceedings of AMTA, 223–231.
 - Devatine, N., and Abraham, L. (2024). Assessing human editing effort on LLM generated texts via compression based edit distance. arXiv preprint. https://arxiv.org/abs/2412.17321
+
+Take your time reading through — let me know what you want changed (tone, sections to cut/add, contributor names once you have them).
