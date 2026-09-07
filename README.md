@@ -73,10 +73,18 @@ Evaluation metric: mean character-level Levenshtein distance against hidden refe
 ## **👥 Contributors**
 
 - Team: Ethopie
+-Mentor: Mr. Patrick Owor
 - Team members:
   1). Iyinoluwa Don-Taiwo(Team Lead)
   2).Monjok Joseph Terem
--Mentor: Mr. Patrick Owor
+  3).Cheikh kandji
+  4).Hammad
+  5).Christian Obichukwu
+  6). Umar Adamu Hussaini
+  7). Emmanuel Chinecherem Nwankwo
+  8).Tijani Fawaz
+  9).Odey Divine
+
 - Program: TRI AI Saturdays, Cohort 10 (Google DeepMind AI Research Foundations curriculum, in partnership with AI Saturdays Lagos)
 
 ## **📜 Acknowledgment**
