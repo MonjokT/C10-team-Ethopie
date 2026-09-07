@@ -73,8 +73,11 @@ Evaluation metric: mean character-level Levenshtein distance against hidden refe
 ## **👥 Contributors**
 
 - Team: Ethopie
--Mentor: Mr. Patrick Owor
+  
+- Mentor: Mr. Patrick Owor
+  
 - Team members:
+  
   1). Iyinoluwa Don-Taiwo(Team Lead)
   2).Monjok Joseph Terem
   3).Cheikh kandji
