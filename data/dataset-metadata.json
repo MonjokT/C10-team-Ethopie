@@ -1,0 +1,63 @@
+{
+  "title": "African Folktales SLM Benchmark",
+  "id": "YOUR_KAGGLE_USERNAME/african-folktales-slm",
+  "subtitle": "Fine-tune a small LM for African folktale generation and preservation",
+  "description": "24-document synthetic folktale corpus with train generation prompts. Submit short stories for test prompts. Scored by mean Levenshtein distance (lower is better).",
+  "licenses": [{ "name": "CC-BY-4.0" }],
+  "keywords": ["folktales", "african-culture", "slm", "fine-tuning", "story-generation", "oral-tradition"],
+  "resources": [
+    {
+      "path": "documents.csv",
+      "description": "24 folktale corpus documents for fine-tuning.",
+      "schema": {
+        "fields": [
+          { "name": "document_id", "type": "string" },
+          { "name": "title", "type": "string" },
+          { "name": "text", "type": "string" },
+          { "name": "theme", "type": "string" },
+          { "name": "culture_region", "type": "string" },
+          { "name": "origin", "type": "string" },
+          { "name": "source_url", "type": "string" },
+          { "name": "license", "type": "string" }
+        ]
+      }
+    },
+    {
+      "path": "train_prompts.csv",
+      "description": "38 training prompt-story pairs.",
+      "schema": {
+        "fields": [
+          { "name": "PromptId", "type": "integer" },
+          { "name": "prompt", "type": "string" },
+          { "name": "theme", "type": "string" },
+          { "name": "culture_region", "type": "string" },
+          { "name": "document_id", "type": "string" },
+          { "name": "reference_story", "type": "string" }
+        ]
+      }
+    },
+    {
+      "path": "test_prompts.csv",
+      "description": "10 test prompts without reference stories.",
+      "schema": {
+        "fields": [
+          { "name": "PromptId", "type": "integer" },
+          { "name": "prompt", "type": "string" },
+          { "name": "theme", "type": "string" },
+          { "name": "culture_region", "type": "string" }
+        ]
+      }
+    },
+    {
+      "path": "sample_submission.csv",
+      "schema": {
+        "fields": [
+          { "name": "PromptId", "type": "integer" },
+          { "name": "Story", "type": "string" }
+        ]
+      }
+    },
+    { "path": "baseline_submission.csv", "description": "Theme-filtered retrieval baseline." },
+    { "path": "DATACARD.md", "description": "Full documentation." }
+  ]
+}
