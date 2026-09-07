@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+lora-checkpoints/
+*.egg-info/
+.venv/
+venv/
