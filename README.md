@@ -1,4 +1,4 @@
-📖 African Folktales SLM — Preserving Oral Tradition with a Domain-Specific Language Model
+# **📖 African Folktales SLM-Preserving Oral Tradition with a Domain-Specific Language Model**
 
 **🌍 Project Overview**
 This project fine-tunes a small language model to generate African folktale narratives that stay faithful to regional themes, dialects, and storytelling structure. Using a synthetic folktale benchmark corpus (documents, prompts, and reference stories spanning trickster tales, origin myths, moral tales, hero journeys, animal fables, and community wisdom across West, East, Southern, Central Africa, and the diaspora), we generate short stories from prompts and score them against hidden reference stories using character-level Levenshtein distance.
@@ -64,12 +64,13 @@ Evaluation metric: mean character-level Levenshtein distance against hidden refe
 
 **👥 Contributors**
 - Team: Ethopie
-- Team members: *(add full names / GitHub handles here)*
-- Mentors: *(add mentor name(s) here)*
-- Program: TRI AI Saturdays, Cohort 10 (Google DeepMind AI Research Foundations curriculum, in partnership with AI Saturdays Lagos and UCL)
+- Team members:
+  1). Iyinoluwa Don-Taiwo(Team Lead)
+  2).Monjok Joseph Terem
+- Program: TRI AI Saturdays, Cohort 10 (Google DeepMind AI Research Foundations curriculum, in partnership with AI Saturdays Lagos)
 
 **📜 Acknowledgment**
-This project was developed as part of TRI AI Saturdays Cohort 10. Thanks to our mentors and cohort peers for their guidance throughout the programme.
+This project was developed as part of TRI AI Saturdays Cohort 10. Thanks to the team, weekly guests,and cohort peers for their guidance throughout the programme.
 
 **🔗 References**
 - Wagner, R. A., and Fischer, M. J. (1974). The string to string correction problem. Journal of the ACM, 21(1), 168–173.
