@@ -6,6 +6,26 @@ This project fine-tunes a small language model to generate African folktale narr
 
 Mainstream LLMs are trained mostly on Western text and often flatten African dialect and narrative voice. This project is a small-scale proof of concept toward domain-specific models that can support cultural preservation, education, and creative storytelling for communities often left out of mainstream AI development.
 
+
+
+
+
+## **📌 Scope Note: Planned vs. Actual Data Source**
+
+
+Our original plan — documented in `docs/problem_statement.docx`, `docs/Data_card.pdf`, `docs/Stakeholder_Engagement_Plan.pdf`, and `docs/impact_statement.pdf` — was to build this model on real-world oral history recordings, community-contributed folktales, and published regional literature, with active stakeholder governance (a Community Review Board of elders, educators, and cultural guardians).
+
+Given the timeline and lack of access to community partners during Cohort 10, we used the **TRI AI Saturdays / Kaggle-provided synthetic benchmark corpus** instead (see [Dataset](#-dataset) above). The stakeholder engagement plan, data sourcing/labeling strategy, and governance model in `docs/` reflect the team's discussions about how this project *should* be run if scaled with real community data — they were not carried out in this phase.
+
+In short:
+- **What we planned:** real-world data sourcing, community labeling and verification, elder/educator governance with veto power over outputs.
+- **What we built:** a fine-tuning exercise on a synthetic, pre-labeled competition dataset, evaluated automatically via Levenshtein distance — no human or community review step.
+
+The `docs/` folder should be read as the target design for a future, fully community-grounded version of this project, not as a description of this submission's dataset or process.
+
+
+
+
 ## **🎯 Objectives**
 
 - Explore and clean the competition's folktale corpus (documents, train and test prompts).
